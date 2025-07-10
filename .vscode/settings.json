@@ -1,11 +1,11 @@
 {
   "C_Cpp.intelliSenseEngine": "default",
-  "idf.espIdfPath": "/home/facundo/esp/v5.4.1/esp-idf",
-  "idf.pythonInstallPath": "/usr/bin/python3",
+  "idf.espIdfPath": "/home/facundo/esp/v5.4.2/esp-idf",
+  "idf.pythonInstallPath": "/usr/bin/python",
   "idf.openOcdConfigs": [
     "board/esp32-wrover-kit-3.3v.cfg"
   ],
-  "idf.port": "/dev/ttyS1",
+  "idf.port": "/dev/ttyUSB0",
   "idf.toolsPath": "/home/facundo/.espressif",
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32"

@@ -15,15 +15,15 @@
 // Pines sensores
 #define TRIGGER_GPIO  32
 #define ECHO_GPIO     33
-#define DHT1_GPIO     4
-#define DHT2_GPIO     5
+#define DHT1_GPIO     25
+#define DHT2_GPIO     26
 
 // WiFi
-#define WIFI_SSID     "TU_SSID"
-#define WIFI_PASS     "TU_PASSWORD"
+#define WIFI_SSID     "MiRaspberryAP"
+#define WIFI_PASS     "123456789"
 
 // MQTT
-#define MQTT_URI      "mqtt://192.168.1.100"  // IP del broker (Raspberry Pi)
+#define MQTT_URI "mqtt://192.168.4.1"
 
 static const char *TAG = "APP";
 esp_mqtt_client_handle_t mqtt_client = NULL;
@@ -112,7 +112,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 
 void mqtt_init() {
     esp_mqtt_client_config_t mqtt_cfg = {
-    .broker.address.uri = "mqtt://broker_ip"
+    .broker.address.uri = "mqtt://192.168.4.1"
 };
 
     mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
