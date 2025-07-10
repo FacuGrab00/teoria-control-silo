@@ -20,6 +20,10 @@
   "files.associations": {
     "esp_log.h": "c",
     "task.h": "c",
-    "esp_event.h": "c"
+    "esp_event.h": "c",
+    "esp_wifi.h": "c",
+    "wifi_mqtt.h": "c",
+    "nvs_flash.h": "c",
+    "esp_netif.h": "c"
   }
 }

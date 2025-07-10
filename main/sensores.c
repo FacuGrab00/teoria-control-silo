@@ -107,6 +107,6 @@ void task_lectura_sensores(void *param)
             esp_mqtt_client_publish(client, "sensor/dht22", buffer, 0, 1, 0);
         }
 
-        vTaskDelay(pdMS_TO_TICKS(5000));
+        vTaskDelay(pdMS_TO_TICKS(3000));
     }
 }
