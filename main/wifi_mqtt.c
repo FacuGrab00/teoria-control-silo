@@ -5,9 +5,9 @@
 #include "esp_netif.h"
 #include "nvs_flash.h"
 
-#define WIFI_SSID "Depto3"
-#define WIFI_PASS "MORA2019"
-#define MQTT_URI "mqtt://192.168.0.106:1883"
+#define WIFI_SSID "MiRaspberryAP"
+#define WIFI_PASS "123456789"
+#define MQTT_URI "mqtt://192.168.4.1:1883"
 
 static const char *TAG_WIFI = "WIFI";
 static const char *TAG_MQTT = "MQTT";
@@ -58,16 +58,24 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t e
 
 void iniciar_wifi()
 {
+    // Inicialización de la interfaz de red ESP
     esp_netif_init();
+
+    // Creación del bucle de eventos por defecto
     esp_event_loop_create_default();
+
+    // Creación de la interfaz de red WiFi por defecto en modo estación (STA)
     esp_netif_create_default_wifi_sta();
 
+    // Configuración inicial del WiFi con la configuración por defecto
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     esp_wifi_init(&cfg);
 
+    // Registro de los manejadores de eventos para eventos WiFi y de IP
     esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL, NULL);
     esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler, NULL, NULL);
 
+    // Configuración de la red WiFi
     wifi_config_t wifi_config = {
         .sta = {
             .ssid = WIFI_SSID,
@@ -75,7 +83,10 @@ void iniciar_wifi()
         },
     };
 
+    // Establecimiento del modo de operación WiFi a estación (STA)
     esp_wifi_set_mode(WIFI_MODE_STA);
+
+    // Configuración y arranque del WiFi con la configuración proporcionada
     esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
     esp_wifi_start();
 }
