@@ -24,6 +24,7 @@
     "esp_wifi.h": "c",
     "wifi_mqtt.h": "c",
     "nvs_flash.h": "c",
-    "esp_netif.h": "c"
+    "esp_netif.h": "c",
+    "ultrasonic.h": "c"
   }
 }

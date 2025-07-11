@@ -4,6 +4,7 @@
 #include "esp_timer.h"
 #include "esp_rom_sys.h"
 #include "dht.h"
+#include "ultrasonic.h"
 #include "wifi_mqtt.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -18,41 +19,28 @@ static const char *TAG = "SENSORES";
 static float temp = -1, hum = -1, distancia = -1;
 
 float get_ultima_temp() { return temp; }
+
 float get_ultima_hum() { return hum; }
+
 float get_ultima_distancia() { return distancia; }
 
-static float medir_distancia()
-{
-    gpio_set_direction(TRIGGER_GPIO, GPIO_MODE_OUTPUT);
-    gpio_set_direction(ECHO_GPIO, GPIO_MODE_INPUT);
-    gpio_set_level(TRIGGER_GPIO, 1);
-    esp_rom_delay_us(10);
-    gpio_set_level(TRIGGER_GPIO, 0);
-
-    int64_t t0 = esp_timer_get_time();
-    while (gpio_get_level(ECHO_GPIO) == 0)
-    {
-        if (esp_timer_get_time() - t0 > 5000)
-            return -1;
-    }
-    int64_t start = esp_timer_get_time();
-    while (gpio_get_level(ECHO_GPIO) == 1)
-    {
-        if (esp_timer_get_time() - start > 60000)
-            return -1;
-    }
-
-    int64_t duration = esp_timer_get_time() - start;
-    return (duration / 2.0) / 29.1;
-}
+static ultrasonic_sensor_t ultrasonic_sensor = {
+    .trigger_pin = TRIGGER_GPIO,
+    .echo_pin = ECHO_GPIO};
 
 static void leer_hcsr04()
 {
-    float d = medir_distancia();
-    if (d >= 0)
+    uint32_t d = 0;
+    esp_err_t res = ultrasonic_measure_cm(&ultrasonic_sensor, 500, &d);
+
+    if (res == ESP_OK)
     {
-        distancia = d;
+        distancia = (float)d;
         ESP_LOGI(TAG, "Distancia: %.2f cm", distancia);
+    }
+    else
+    {
+        ESP_LOGW(TAG, "Error leyendo HC-SR04: %s", esp_err_to_name(res));
     }
 }
 
@@ -90,6 +78,8 @@ static void leer_dht()
 
 void task_lectura_sensores(void *param)
 {
+    ultrasonic_init(&ultrasonic_sensor);
+
     while (1)
     {
         leer_hcsr04();
@@ -100,13 +90,16 @@ void task_lectura_sensores(void *param)
         if (client)
         {
             char buffer[128];
+
             snprintf(buffer, sizeof(buffer), "{\"distancia\": %.2f}", distancia);
-            esp_mqtt_client_publish(client, "sensor/distancia", buffer, 0, 1, 0);
+            int msg_id1 = esp_mqtt_client_publish(client, "sensor/distancia", buffer, 0, 1, 0);
+            ESP_LOGI(TAG, "Publicando distancia. msg_id=%d", msg_id1);
 
             snprintf(buffer, sizeof(buffer), "{\"temperatura\": %.1f, \"humedad\": %.1f}", temp, hum);
-            esp_mqtt_client_publish(client, "sensor/dht22", buffer, 0, 1, 0);
+            int msg_id2 = esp_mqtt_client_publish(client, "sensor/dht22", buffer, 0, 1, 0);
+            ESP_LOGI(TAG, "Publicando DHT. msg_id=%d", msg_id2);
         }
 
-        vTaskDelay(pdMS_TO_TICKS(3000));
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
