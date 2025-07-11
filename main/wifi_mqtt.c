@@ -5,8 +5,8 @@
 #include "esp_netif.h"
 #include "nvs_flash.h"
 
-#define WIFI_SSID "Depto3"
-#define WIFI_PASS "MORA2019"
+#define WIFI_SSID "MiRaspberryAP"
+#define WIFI_PASS "123456789"
 #define MQTT_URI  "mqtt://192.168.4.1:1883"
 
 static const char *TAG_WIFI = "WIFI";
